@@ -5,7 +5,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 const vitePWA = VitePWA({
-  registerType: 'autoUpdate',
+  registerType: 'prompt',
   injectRegister: false,
   pwaAssets: {
     disabled: false,
@@ -19,9 +19,11 @@ const vitePWA = VitePWA({
   },
   workbox: {
     globPatterns: ['**/*.{js,css,html,ico,png,svg}'],
+    cleanupOutdatedCaches: true,
+    sourcemap: true,
   },
   devOptions: {
-    enabled: false,
+    enabled: true,
     navigateFallback: 'index.html',
     suppressWarnings: true,
     type: 'module',

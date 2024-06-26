@@ -26,8 +26,13 @@ const RecipeListPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-3 py-3 max-h-screen overflow-y-auto">
-      {recipes?.map((recipe) => <RecipeListItem key={recipe.id} recipe={recipe} />)}
+    <div>
+      <Button asChild>
+        <Link to={paths.recipe.create}>Создать</Link>
+      </Button>
+      <div className="flex flex-col gap-3 py-3 max-h-screen overflow-y-auto">
+        {recipes?.map((recipe) => <RecipeListItem key={recipe.id} recipe={recipe} />)}
+      </div>
     </div>
   )
 }
