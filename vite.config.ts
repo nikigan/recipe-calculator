@@ -1,5 +1,5 @@
 import { VitePWA } from 'vite-plugin-pwa'
-import { defineConfig } from 'vite'
+import { ConfigEnv, defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import path from 'path'
 
@@ -28,12 +28,16 @@ const vitePWA = VitePWA({
   },
 })
 
-export default defineConfig({
-  // base: '/recipe-calculator/',
-  plugins: [react(), vitePWA],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
+export default (configEnv: ConfigEnv) => {
+  const env = { ...process.env, ...loadEnv(configEnv.mode, process.cwd(), '') }
+
+  return defineConfig({
+    base: env.VITE_BASE,
+    plugins: [react(), vitePWA],
+    resolve: {
+      alias: {
+        '@': path.resolve(__dirname, './src'),
+      },
     },
-  },
-})
+  })
+}

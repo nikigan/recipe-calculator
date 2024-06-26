@@ -5,12 +5,33 @@ import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { MinusCircle, PlusCircle } from 'lucide-react'
 import DragInput from '@/components/DragInput.tsx'
+import { Recipe } from '@/db.ts'
+import { useContext } from 'react'
+import { EditingContext } from '@/pages/RecipeId.tsx'
 
-const RecipeItems = () => {
-  const { formState } = useFormContext()
+const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
+  const { formState, setValue } = useFormContext()
   const { fields, append, remove } = useFieldArray<Inputs>({
     name: 'items',
   })
+
+  const { isEditing } = useContext(EditingContext)
+
+  const handleInputChange = (index: number, value: number) => {
+    if (isEditing || !recipe) return
+
+    const newValue = value
+    const oldValue = recipe.items[index].quantity
+    const ratio = newValue / oldValue
+
+    fields.forEach((_, i) => {
+      if (i !== index) {
+        const old = recipe.items[i].quantity
+        const updatedValue = old * ratio
+        setValue(`items.${i}.quantity`, Number(updatedValue.toFixed(1)))
+      }
+    })
+  }
 
   return (
     <div className="space-y-3">
@@ -20,17 +41,28 @@ const RecipeItems = () => {
           <FormField
             render={({ field }) => (
               <>
-                <Input placeholder="Ингредиент" readOnly={field.disabled} {...field} />
+                <Input
+                  placeholder="Ингредиент"
+                  readOnly={field.disabled}
+                  className="disabled:!pointer-events-none"
+                  {...field}
+                />
               </>
             )}
             name={`items.${index}.name`}
           />
-          {/*<FormField
-            render={({ field }) => <Input placeholder="Количество" {...field} />}
-            name={`items.${index}.quantity`}
-          />*/}
           <FormField
-            render={({ field }) => <DragInput placeholder="Количество" {...field} />}
+            render={({ field }) => (
+              <DragInput
+                placeholder="Количество"
+                {...field}
+                disabled={false}
+                onChange={(value) => {
+                  handleInputChange(index, value)
+                  field.onChange(value)
+                }}
+              />
+            )}
             name={`items.${index}.quantity`}
           />
           {!formState.disabled && (

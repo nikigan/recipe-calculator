@@ -2,11 +2,17 @@ import { Input, InputProps } from '@/components/ui/input.tsx'
 import { forwardRef, useCallback, useEffect, useState } from 'react'
 import { clsx } from 'clsx'
 
-const DragInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
+type DragInputProps = Omit<InputProps, 'onChange'> & {
+  onChange?: (value: number) => void
+}
+
+const DRAG_SPEED = 0.7
+
+const DragInput = forwardRef<HTMLInputElement, DragInputProps>((props, ref) => {
   // We are creating a snapshot of the values when the drag starts
   // because the [value] will itself change & we need the original
   // [value] to calculate during a drag.
-  const [snapshot, setSnapshot] = useState(props)
+  const [snapshot, setSnapshot] = useState(Number(props.value) || 0)
 
   // This captures the starting position of the drag and is used to
   // calculate the diff in positions of the cursor.
@@ -14,7 +20,7 @@ const DragInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
   // Start the drag to change operation when the mouse button is down.
   const onStart = useCallback(
-    (event) => {
+    (event: MouseEvent | TouchEvent) => {
       console.log('onStart', props.value)
       let clientX = 0
       if ('clientX' in event) {
@@ -25,7 +31,7 @@ const DragInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
       setStartVal(clientX)
       if (props.value) {
-        setSnapshot(props.value)
+        setSnapshot(Number(props.value))
       }
     },
     [props.value],
@@ -46,10 +52,11 @@ const DragInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
         }
 
         let ratio = (startVal - clientX) / (startVal || 1)
-        ratio *= -1
-        ratio *= 10 * 0.3
+        ratio *= -1 * DRAG_SPEED
         ratio += 1
-        props.onChange((snapshot * ratio).toFixed(0))
+        if (props.onChange) {
+          props.onChange(Math.ceil(snapshot * ratio))
+        }
       }
     }
 
@@ -73,14 +80,21 @@ const DragInput = forwardRef<HTMLInputElement, InputProps>((props, ref) => {
 
   return (
     <Input
+      // @ts-ignore
       onMouseDown={onStart}
+      // @ts-ignore
       onTouchStart={onStart}
       className={clsx({
         'cursor-grab': !startVal,
         'cursor-col-resize': startVal,
       })}
-      {...props}
       ref={ref}
+      {...props}
+      onChange={(event) => {
+        if (props.onChange) {
+          props.onChange(Number(event.target.value))
+        }
+      }}
     />
   )
 })

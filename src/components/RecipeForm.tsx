@@ -8,7 +8,10 @@ import { db, Recipe } from '@/db.ts'
 import { Button } from '@/components/ui/button.tsx'
 import { useContext, useEffect } from 'react'
 import { EditingContext } from '@/pages/RecipeId.tsx'
-import { Pencil, PencilOff } from 'lucide-react'
+import { Pencil } from 'lucide-react'
+import { paths } from '@/lib/router.tsx'
+import { reverse } from 'named-urls'
+import { useNavigate } from 'react-router-dom'
 
 const schema = z.object({
   title: z.string(),
@@ -24,6 +27,8 @@ export type Inputs = z.infer<typeof schema>
 
 const RecipeForm = ({ recipe }: { recipe?: Recipe }) => {
   const { isEditing, setIsEditing } = useContext(EditingContext)
+
+  const navigate = useNavigate()
 
   const disabled = !isEditing && !!recipe
 
@@ -48,44 +53,60 @@ const RecipeForm = ({ recipe }: { recipe?: Recipe }) => {
     }
   }, [form, recipe])
 
+  const submitHandler = async (data: Inputs) => {
+    if (isEditing) {
+      if (recipe) {
+        await db.recipes.update(recipe.id, {
+          title: data.title,
+          items: data.items.map((item) => ({
+            name: item.name,
+            quantity: item.quantity,
+          })),
+        })
+      }
+
+      setIsEditing(false)
+      return
+    }
+
+    const id = await db.recipes.add({
+      title: data.title,
+      items: data.items.map((item) => ({
+        name: item.name,
+        quantity: item.quantity,
+      })),
+    })
+
+    navigate(reverse(paths.recipe.recipe, { id }))
+  }
   return (
     <div>
       <div className="flex justify-end">
-        <Button
-          variant={isEditing ? 'default' : 'ghost'}
-          size="icon"
-          onClick={() => setIsEditing((prev: boolean) => !prev)}
-        >
-          <Pencil strokeWidth={1.5} />
-        </Button>
+        {recipe && (
+          <Button
+            variant={isEditing ? 'default' : 'ghost'}
+            size="icon"
+            onClick={() => setIsEditing((prev: boolean) => !prev)}
+          >
+            <Pencil strokeWidth={1.5} />
+          </Button>
+        )}
       </div>
       <Form {...form}>
-        <form
-          className="space-y-3"
-          onSubmit={form.handleSubmit(async (data) => {
-            const id = await db.recipes.add({
-              title: data.title,
-              items: data.items.map((item) => ({
-                name: item.name,
-                quantity: item.quantity,
-              })),
-            })
-            console.log('Recipe added with id', id)
-          }, console.error)}
-        >
+        <form className="space-y-3" onSubmit={form.handleSubmit(submitHandler, console.error)}>
           <FormField
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Название рецепта</FormLabel>
                 <FormControl>
-                  <Input placeholder="Название" {...field} />
+                  <Input placeholder="Название" {...field} className="disabled:!pointer-events-none" />
                 </FormControl>
                 <FormMessage />
               </FormItem>
             )}
             name="title"
           />
-          <RecipeItems />
+          <RecipeItems recipe={recipe} />
           {!disabled && (
             <Button type="submit" disabled={!form.formState.isDirty}>
               Сохранить

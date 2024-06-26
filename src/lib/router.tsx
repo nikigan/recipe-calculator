@@ -1,8 +1,9 @@
-import { createBrowserRouter } from 'react-router-dom'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
 import RootLayout from '@/layouts/RootLayout.tsx'
 import { include } from 'named-urls'
 import RecipeListPage from '@/pages/RecipeListPage.tsx'
 import RecipeId from '@/pages/RecipeId.tsx'
+import RecipeCreatePage from '@/pages/RecipeCreatePage'
 
 export const paths = {
   home: '/',
@@ -15,7 +16,6 @@ export const paths = {
 
 export const router = createBrowserRouter([
   {
-    path: paths.home,
     element: <RootLayout />,
     children: [
       {
@@ -23,8 +23,16 @@ export const router = createBrowserRouter([
         element: <RecipeListPage />,
       },
       {
+        path: paths.recipe.create,
+        element: <RecipeCreatePage />,
+      },
+      {
         path: paths.recipe.recipe,
         element: <RecipeId />,
+      },
+      {
+        path: '*',
+        element: <Navigate to={paths.recipe.list} replace={true} />,
       },
     ],
   },
