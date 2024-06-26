@@ -14,26 +14,31 @@ export const paths = {
   }),
 }
 
-export const router = createBrowserRouter([
+export const router = createBrowserRouter(
+  [
+    {
+      element: <RootLayout />,
+      children: [
+        {
+          path: paths.recipe.list,
+          element: <RecipeListPage />,
+        },
+        {
+          path: paths.recipe.create,
+          element: <RecipeCreatePage />,
+        },
+        {
+          path: paths.recipe.recipe,
+          element: <RecipeId />,
+        },
+        {
+          path: '*',
+          element: <Navigate to={paths.recipe.list} replace={true} />,
+        },
+      ],
+    },
+  ],
   {
-    element: <RootLayout />,
-    children: [
-      {
-        path: paths.recipe.list,
-        element: <RecipeListPage />,
-      },
-      {
-        path: paths.recipe.create,
-        element: <RecipeCreatePage />,
-      },
-      {
-        path: paths.recipe.recipe,
-        element: <RecipeId />,
-      },
-      {
-        path: '*',
-        element: <Navigate to={paths.recipe.list} replace={true} />,
-      },
-    ],
+    basename: import.meta.env.VITE_BASE,
   },
-])
+)
