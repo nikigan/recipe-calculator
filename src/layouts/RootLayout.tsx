@@ -11,7 +11,7 @@ const RootLayout = () => {
       <div className="container py-3">
         <Outlet />
       </div>
-      <nav className="fixed left-0 bottom-0 w-full right-0 px-3 py-3 flex justify-between pb-safe-or-5">
+      <nav className="fixed left-0 bottom-0 w-full right-0 px-3 py-3 flex justify-between pb-safe-or-8">
         <Button size="icon" variant="outline" className="h-12 w-12" onClick={() => navigate(-1)}>
           <ChevronLeft />
         </Button>

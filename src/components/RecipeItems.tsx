@@ -1,6 +1,6 @@
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { Inputs } from '@/components/RecipeForm.tsx'
-import { FormField } from '@/components/ui/form.tsx'
+import { FormControl, FormField, FormMessage } from '@/components/ui/form.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { MinusCircle, PlusCircle } from 'lucide-react'
@@ -8,6 +8,7 @@ import DragInput from '@/components/DragInput.tsx'
 import { Recipe } from '@/db.ts'
 import { useContext } from 'react'
 import { EditingContext } from '@/pages/RecipeId.tsx'
+import { clsx } from 'clsx'
 
 const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
   const { formState, setValue } = useFormContext()
@@ -40,28 +41,31 @@ const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
           <span className="flex-shrink-1">{index + 1}.</span>
           <FormField
             render={({ field }) => (
-              <>
+              <FormControl>
                 <Input
                   placeholder="Ингредиент"
                   readOnly={field.disabled}
-                  className="disabled:!pointer-events-none"
+                  className={clsx('disabled:!pointer-events-none')}
                   {...field}
                 />
-              </>
+              </FormControl>
             )}
             name={`items.${index}.name`}
           />
           <FormField
             render={({ field }) => (
-              <DragInput
-                placeholder="Количество"
-                {...field}
-                disabled={false}
-                onChange={(value) => {
-                  handleInputChange(index, value)
-                  field.onChange(value)
-                }}
-              />
+              <FormControl>
+                <DragInput
+                  placeholder="Количество"
+                  className={clsx('disabled:!pointer-events-none')}
+                  {...field}
+                  disabled={false}
+                  onChange={(value) => {
+                    handleInputChange(index, value)
+                    field.onChange(value)
+                  }}
+                />
+              </FormControl>
             )}
             name={`items.${index}.quantity`}
           />
@@ -89,6 +93,7 @@ const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
           <PlusCircle size="15" /> <span>Добавить</span>
         </Button>
       )}
+      <FormField render={() => <FormMessage />} name="items" />
     </div>
   )
 }

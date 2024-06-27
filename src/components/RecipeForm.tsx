@@ -14,13 +14,15 @@ import { reverse } from 'named-urls'
 import { useNavigate } from 'react-router-dom'
 
 const schema = z.object({
-  title: z.string(),
-  items: z.array(
-    z.object({
-      name: z.string(),
-      quantity: z.coerce.number(),
-    }),
-  ),
+  title: z.string().min(1, 'Введите название рецепта'),
+  items: z
+    .array(
+      z.object({
+        name: z.string().min(1, 'Введите название ингредиента'),
+        quantity: z.coerce.number().gt(0, 'Введите количество'),
+      }),
+    )
+    .min(1, 'Добавьте хотя бы один ингредиент'),
 })
 
 export type Inputs = z.infer<typeof schema>
