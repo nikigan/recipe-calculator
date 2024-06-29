@@ -1,12 +1,24 @@
 import { Input, InputProps } from '@/components/ui/input.tsx'
 import { forwardRef, useCallback, useEffect, useState } from 'react'
-import { clsx } from 'clsx'
+import { motion, Variants } from 'framer-motion'
+import { cn } from '@/lib/utils.ts'
 
 type DragInputProps = Omit<InputProps, 'onChange'> & {
   onChange?: (value: number) => void
 }
 
 const DRAG_SPEED = 0.7
+
+const variants: Variants = {
+  modal: {
+    scale: 1.05,
+    flexBasis: '200%',
+  },
+  input: {
+    scale: 1,
+    flexBasis: '100%',
+  },
+}
 
 const DragInput = forwardRef<HTMLInputElement, DragInputProps>((props, ref) => {
   // We are creating a snapshot of the values when the drag starts
@@ -17,6 +29,8 @@ const DragInput = forwardRef<HTMLInputElement, DragInputProps>((props, ref) => {
   // This captures the starting position of the drag and is used to
   // calculate the diff in positions of the cursor.
   const [startVal, setStartVal] = useState(0)
+
+  const [isModal, setIsModal] = useState(false)
 
   // Start the drag to change operation when the mouse button is down.
   const onStart = useCallback(
@@ -79,23 +93,42 @@ const DragInput = forwardRef<HTMLInputElement, DragInputProps>((props, ref) => {
   }, [startVal, snapshot, props.onChange])
 
   return (
-    <Input
-      // @ts-ignore
-      onMouseDown={onStart}
-      // @ts-ignore
-      onTouchStart={onStart}
-      className={clsx({
-        'cursor-grab': !startVal,
-        'cursor-col-resize': startVal,
-      })}
-      ref={ref}
-      {...props}
-      onChange={(event) => {
-        if (props.onChange) {
-          props.onChange(Number(event.target.value))
-        }
+    <motion.div
+      variants={variants}
+      layout
+      animate={isModal ? 'modal' : 'input'}
+      onPanStart={() => {
+        setIsModal(true)
       }}
-    />
+      onPanEnd={() => {
+        setIsModal(false)
+      }}
+    >
+      <Input
+        // @ts-ignore
+        onMouseDown={onStart}
+        // @ts-ignore
+        onTouchStart={onStart}
+        style={{
+          touchAction: 'none',
+        }}
+        ref={ref}
+        {...props}
+        onChange={(event) => {
+          if (props.onChange) {
+            props.onChange(Number(event.target.value))
+          }
+        }}
+        className={cn(
+          {
+            'cursor-grab': !startVal,
+            'cursor-col-resize': startVal,
+          },
+          'bg-background',
+          props.className,
+        )}
+      />
+    </motion.div>
   )
 })
 

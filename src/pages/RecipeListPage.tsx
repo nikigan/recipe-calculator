@@ -26,7 +26,7 @@ const RecipeListPage = () => {
   }
 
   return (
-    <div>
+    <div className="mx-auto max-w-screen-md">
       <Button asChild>
         <Link to={paths.recipe.create}>Создать</Link>
       </Button>
