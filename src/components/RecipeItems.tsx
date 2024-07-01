@@ -1,6 +1,6 @@
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { Inputs } from '@/components/RecipeForm.tsx'
-import { FormControl, FormField, FormMessage } from '@/components/ui/form.tsx'
+import { FormControl, FormField, FormItem, FormMessage } from '@/components/ui/form.tsx'
 import { Input } from '@/components/ui/input.tsx'
 import { Button } from '@/components/ui/button.tsx'
 import { MinusCircle, PlusCircle } from 'lucide-react'
@@ -9,6 +9,7 @@ import { Recipe } from '@/db.ts'
 import { useContext } from 'react'
 import { EditingContext } from '@/pages/RecipeId.tsx'
 import { clsx } from 'clsx'
+import { motion } from 'framer-motion'
 
 const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
   const { formState, setValue } = useFormContext()
@@ -37,18 +38,22 @@ const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
   return (
     <div className="space-y-3">
       {fields.map((field, index) => (
-        <div key={field.id} className="flex gap-3 items-center">
+        <motion.div layout key={field.id} className="flex gap-3 items-center">
           <span className="flex-shrink-1">{index + 1}.</span>
           <FormField
             render={({ field }) => (
-              <FormControl>
-                <Input
-                  placeholder="Ингредиент"
-                  readOnly={field.disabled}
-                  className={clsx('disabled:!pointer-events-none')}
-                  {...field}
-                />
-              </FormControl>
+              <FormItem>
+                <motion.div layout>
+                  <FormControl>
+                    <Input
+                      placeholder="Ингредиент"
+                      readOnly={field.disabled}
+                      className={clsx('disabled:!pointer-events-none')}
+                      {...field}
+                    />
+                  </FormControl>
+                </motion.div>
+              </FormItem>
             )}
             name={`items.${index}.name`}
           />
@@ -81,7 +86,7 @@ const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
               <MinusCircle size="15" />
             </Button>
           )}
-        </div>
+        </motion.div>
       ))}
       {!formState.disabled && (
         <Button
