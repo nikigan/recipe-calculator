@@ -24,11 +24,9 @@ const RecipeId = () => {
   }
 
   return (
-    <div>
-      <EditingContext.Provider value={{ isEditing, setIsEditing }}>
-        <RecipeForm recipe={recipe} />
-      </EditingContext.Provider>
-    </div>
+    <EditingContext.Provider value={{ isEditing, setIsEditing }}>
+      <RecipeForm recipe={recipe} />
+    </EditingContext.Provider>
   )
 }
 

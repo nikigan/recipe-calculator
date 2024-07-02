@@ -1,11 +1,7 @@
 import RecipeForm from '@/components/RecipeForm.tsx'
 
 const RecipeCreatePage = () => {
-  return (
-    <div>
-      <RecipeForm />
-    </div>
-  )
+  return <RecipeForm />
 }
 
 export default RecipeCreatePage

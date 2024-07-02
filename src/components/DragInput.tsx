@@ -125,8 +125,9 @@ const DragInput = forwardRef<HTMLInputElement, DragInputProps>((props, ref) => {
           style={{
             touchAction: 'none',
           }}
-          type="number"
           step="0.1"
+          type="number"
+          min="0"
           ref={(r) => {
             localRef.current = r
             if (ref) {
@@ -141,7 +142,7 @@ const DragInput = forwardRef<HTMLInputElement, DragInputProps>((props, ref) => {
           {...props}
           onChange={(event) => {
             if (props.onChange) {
-              props.onChange(Number(event.target.value))
+              props.onChange(parseFloat(event.target.value))
             }
           }}
           className={cn(

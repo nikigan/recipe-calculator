@@ -6,12 +6,20 @@ import { Button } from '@/components/ui/button.tsx'
 import { MinusCircle, PlusCircle } from 'lucide-react'
 import DragInput from '@/components/DragInput.tsx'
 import { Recipe } from '@/db.ts'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { EditingContext } from '@/pages/RecipeId.tsx'
 import { clsx } from 'clsx'
 import { motion } from 'framer-motion'
 
-const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
+const RecipeItems = ({
+  recipe,
+  ratio,
+  setRatio,
+}: {
+  recipe?: Recipe
+  ratio: number
+  setRatio: (ratio: number) => void
+}) => {
   const { formState, setValue } = useFormContext()
   const { fields, append, remove } = useFieldArray<Inputs>({
     name: 'items',
@@ -26,14 +34,22 @@ const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
     const oldValue = recipe.items[index].quantity
     const ratio = newValue / oldValue
 
-    fields.forEach((_, i) => {
-      if (i !== index) {
+    if (isNaN(ratio)) {
+      return
+    }
+
+    setRatio(ratio)
+  }
+
+  useEffect(() => {
+    if (recipe) {
+      fields.forEach((_, i) => {
         const old = recipe.items[i].quantity
         const updatedValue = old * ratio
         setValue(`items.${i}.quantity`, Number(updatedValue.toFixed(1)))
-      }
-    })
-  }
+      })
+    }
+  }, [fields, ratio, recipe, setValue])
 
   return (
     <div className="space-y-3">
@@ -93,7 +109,8 @@ const RecipeItems = ({ recipe }: { recipe?: Recipe }) => {
           type="button"
           variant="outline"
           className="flex space-x-3 border-dashed"
-          onClick={() => append({ name: '', quantity: 0 })}
+          // @ts-ignore
+          onClick={() => append({ name: '', quantity: '' })}
         >
           <PlusCircle size="15" /> <span>Добавить</span>
         </Button>

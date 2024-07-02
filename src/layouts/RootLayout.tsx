@@ -8,7 +8,7 @@ const RootLayout = () => {
 
   return (
     <main className="overflow-y-auto max-h-[calc(100vh-75px)] h-screen overscroll-none">
-      <div className="container py-3">
+      <div className="container py-3 h-full">
         <Outlet />
       </div>
       <nav className="fixed left-0 bottom-0 w-full right-0 px-3 py-3 flex justify-between pb-safe-or-8">
